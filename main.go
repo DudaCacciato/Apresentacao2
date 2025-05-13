@@ -17,7 +17,8 @@ func main() {
 
 	for {
 		f.Println("\n------ MENU ------")
-		menuPrato()
+		menuPrato(),
+
 		menuBebida()
 
 		for{
