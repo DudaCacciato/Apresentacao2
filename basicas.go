@@ -1,9 +1,6 @@
 package main
 
-import (
-	f "fmt"
-	"math/rand"
-)
+import f "fmt"
 
 
 func valorPratoEBebida (numPrato, numBebida int) float64 {
