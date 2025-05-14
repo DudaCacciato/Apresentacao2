@@ -6,9 +6,17 @@ import (
 	"math/rand"
 )
 
-// Interface
+// Interface para funções de pedido
 type OrderInterface interface {
 	Order(chan Meal)
+}
+
+// Interface para funções de nota fiscal
+type ReceiptInterface interface {
+	AddOrder(chan Meal)
+	CalculateFeeAndFinal()
+	CalculateTotal()
+	ToJSON() ([]byte, error)
 }
 
 // Structs
@@ -70,6 +78,22 @@ func (r *Receipt) ToJSON() ([]byte, error) {
 		return nil, err
 	}
 	return jsonData, nil
+}
+
+// Função que irá receber os pedidos e retornar a ordem de pedidos de prioridade
+func PriorityOrder(orders ...chan Meal) (chan Meal) {
+
+	c := make(chan Meal)
+	
+	go func() {
+		for _, orderChan := range orders {
+            for order := range orderChan {
+                c <- order
+            }
+        }
+	}()
+
+	return c
 }
 
 // Map de bebidas
