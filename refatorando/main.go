@@ -1,10 +1,7 @@
 package main
 
-<<<<<<< HEAD
 import "fmt"
 
-=======
->>>>>>> 3b61749a05b6e0512b63749bf650dea3c0dfbfe9
 func main() {
 
 	//Refeições
@@ -32,7 +29,6 @@ func main() {
 		Drink: []string{"Cerveja", "Suco"},
 		Food:  []string{"Macarrão com queijo, presunto e brócolis", "Feijão preto com bacon e salada de batata"},
 	}
-<<<<<<< HEAD
 
 	//Canal de pedidos
 	order1 := Order(meal1, meal2)
@@ -70,6 +66,3 @@ func main() {
 	}
 
 }
-=======
-}
->>>>>>> 3b61749a05b6e0512b63749bf650dea3c0dfbfe9
