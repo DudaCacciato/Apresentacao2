@@ -3,22 +3,31 @@ package main
 //Importações
 import (
 	"encoding/json"
+	"math"
 	"math/rand"
 )
 
-// Interface
+// Interface para funções de pedido
 type OrderInterface interface {
 	Order(chan Meal)
 }
 
+// Interface para funções de nota fiscal
+type ReceiptInterface interface {
+	AddOrder(chan Meal)
+	CalculateFeeAndFinal()
+	CalculateTotal()
+	ToJSON() ([]byte, error)
+}
+
 // Structs
 type Meal struct {
-	drink []string
-	food  []string
+	Drink []string
+	Food  []string
 }
 
 type Receipt struct {
-	ID 			 int    `json:"id"`
+	ID           int     `json:"id"`
 	OrderChannel []Meal  `json:"order"`
 	FeeAmount    float64 `json:"fee_amount"`
 	TotalAmount  float64 `json:"total_amount"`
@@ -28,11 +37,12 @@ type Receipt struct {
 //Funções
 
 // Função que insere o pedido no canal de pedidos
-func Order(meal ...Meal) <-chan Meal {
+func Order(meal ...Meal) chan Meal {
 
 	c := make(chan Meal)
 
 	go func() {
+		defer close(c)
 		for _, m := range meal {
 			c <- m
 		}
@@ -42,7 +52,7 @@ func Order(meal ...Meal) <-chan Meal {
 }
 
 // Função que insere os dados do canal de pedidos a nota fiscal
-func (r *Receipt) AddOrder(c <-chan Meal) {
+func (r *Receipt) AddOrder(c chan Meal) {
 
 	// Adiciona o ID da nota fiscal
 	rand.Seed(rand.Int63())
@@ -56,12 +66,35 @@ func (r *Receipt) AddOrder(c <-chan Meal) {
 
 // Função que calcula a taxa de serviço e o valor final com taxa e adiciona na struct
 func (r *Receipt) CalculateFeeAndFinal() {
-	r.FeeAmount = 0.10 * r.TotalAmount
-	r.FinalAmount = r.TotalAmount + r.FeeAmount
+	r.FeeAmount = math.Round(0.10 * r.TotalAmount)
+	r.FinalAmount = math.Round(r.TotalAmount + r.FeeAmount)
 }
 
 // Função que calcula o total sem taxa e adiciona na struct
-func (r *Receipt) CalculateTotal() {}
+func (r *Receipt) CalculateTotal() {
+	total := 0.0
+	drinksMenu := DrinksMenu()
+	foodsMenu := FoodsMenu()
+
+	for _, m := range r.OrderChannel {
+		for _, drink := range m.Drink {
+			for name, price := range drinksMenu {
+				if drink == name {
+					total += price
+				}
+			}
+		}
+		for _, food := range m.Food {
+			for name, price := range foodsMenu {
+				if food == name {
+					total += price
+				}
+			}
+		}
+	}
+
+	r.TotalAmount = math.Round(total)
+}
 
 // Função que converte a nota fiscal para json
 func (r *Receipt) ToJSON() ([]byte, error) {
@@ -76,18 +109,18 @@ func (r *Receipt) ToJSON() ([]byte, error) {
 func DrinksMenu() map[string]float64 {
 	return map[string]float64{
 		"Refrigerante": 5.0,
-		"Suco":        7.0,
-		"Cerveja":     10.0,
-		"Água":       3.0,
+		"Suco":         7.0,
+		"Cerveja":      10.0,
+		"Água":         3.0,
 	}
 }
 
 // Map de comidas
 func FoodsMenu() map[string]float64 {
 	return map[string]float64{
-		"Bife acebolado": 20.0,
+		"Bife acebolado":    20.0,
 		"Arroz amanteigado": 15.0,
-		"Macarrão com queijo, presunto e brócolis": 18.0,
+		"Macarrão com queijo, presunto e brócolis":  18.0,
 		"Feijão preto com bacon e salada de batata": 12.0,
 	}
 }
