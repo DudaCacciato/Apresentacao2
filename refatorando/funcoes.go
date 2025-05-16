@@ -27,41 +27,24 @@ type Meal struct {
 }
 
 type Receipt struct {
-	ID           int     `json:"id"`
-	OrderChannel []Meal  `json:"order"`
-	FeeAmount    float64 `json:"fee_amount"`
-	TotalAmount  float64 `json:"total_amount"`
-	FinalAmount  float64 `json:"final_amount"`
+	ID          int     `json:"id"`
+	Order       []Meal  `json:"order"`
+	FeeAmount   float64 `json:"fee_amount"`
+	TotalAmount float64 `json:"total_amount"`
+	FinalAmount float64 `json:"final_amount"`
 }
 
 //Funções
 
-// Função que insere o pedido no canal de pedidos
-func Order(meal ...Meal) chan Meal {
-
-	c := make(chan Meal)
-
-	go func() {
-		defer close(c)
-		for _, m := range meal {
-			c <- m
-		}
-	}()
-
-	return c
-}
-
 // Função que insere os dados do canal de pedidos a nota fiscal
-func (r *Receipt) AddOrder(c chan Meal) {
+func (r *Receipt) AddOrder(meal Meal) {
 
 	// Adiciona o ID da nota fiscal
 	rand.Seed(rand.Int63())
 	r.ID = rand.Intn(500)
 
 	//Adicionando os pedidos a nota fiscal
-	for m := range c {
-		r.OrderChannel = append(r.OrderChannel, m)
-	}
+	r.Order = append(r.Order, meal)
 }
 
 // Função que calcula a taxa de serviço e o valor final com taxa e adiciona na struct
@@ -76,7 +59,7 @@ func (r *Receipt) CalculateTotal() {
 	drinksMenu := DrinksMenu()
 	foodsMenu := FoodsMenu()
 
-	for _, m := range r.OrderChannel {
+	for _, m := range r.Order {
 		for _, drink := range m.Drink {
 			for name, price := range drinksMenu {
 				if drink == name {

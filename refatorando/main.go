@@ -3,7 +3,6 @@ package main
 import "fmt"
 
 func main() {
-
 	//Refeições
 	meal1 := Meal{
 		Drink: []string{"Cerveja", "Refrigerante"},
@@ -30,39 +29,34 @@ func main() {
 		Food:  []string{"Macarrão com queijo, presunto e brócolis", "Feijão preto com bacon e salada de batata"},
 	}
 
-	//Canal de pedidos
-	order1 := Order(meal1, meal2)
-	order2 := Order(meal3)
-	order3 := Order(meal4, meal5)
+	// Adicionando as refeições 
 
-	//Receitas
-	receipt1 := &Receipt{}
-	receipt2 := &Receipt{}
-	receipt3 := &Receipt{}
+	orders := []Meal{meal1, meal2, meal3, meal4, meal5}
 
-	//Adicionando os pedidos a receita
-	receipt1.AddOrder(order1)
-	receipt2.AddOrder(order2)
-	receipt3.AddOrder(order3)
+	orderChannel := make(chan Meal)
 
-	//Calculando o total
-	receipt1.CalculateTotal()
-	receipt2.CalculateTotal()
-	receipt3.CalculateTotal()
+	go func() {
+		for _, order := range orders {
+			orderChannel <- order
+		}
+		close(orderChannel)
+	}()
 
-	//Calculando a taxa
-	receipt1.CalculateFeeAndFinal()
-	receipt2.CalculateFeeAndFinal()
-	receipt3.CalculateFeeAndFinal()
 
-	//Convertendo para JSON
-	json1, _ := receipt1.ToJSON()
-	json2, _ := receipt2.ToJSON()
-	json3, _ := receipt3.ToJSON()
+	for meal := range orderChannel {
+		receipt := &Receipt{}
 
-	//Imprimindo o resultado
-	for i, json := range [][]byte{json1, json2, json3} {
-		fmt.Printf("Pedido %d: %s\n", i+1, json)
+		receipt.AddOrder(meal)
+		receipt.CalculateTotal()
+		receipt.CalculateFeeAndFinal()
+
+		jsonData, err := receipt.ToJSON()
+		if err != nil {
+			fmt.Println("Erro ao converter para JSON:", err)
+			return
+		}
+		fmt.Println(string(jsonData))
 	}
+
 
 }
