@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"sync"
+	"time"
+)
 
 func main() {
 	//Refeições
@@ -33,7 +38,6 @@ func main() {
 	// Adicionando as refeições
 
 	orderChannel := make(chan Meal, len(orders))
-	defer close(orderChannel)
 
 	// for _, meal := range orders {
 	// 	go func(m Meal) {
@@ -42,11 +46,21 @@ func main() {
 	// 	}(meal)
 	// }
 
+	wg := &sync.WaitGroup{}
+	wg.Add(len(orders))
+
 	for _, meal := range orders {
 		go func(Meal) {
+			rand.Seed(rand.Int63())
+			nRandom := rand.Intn(5)
+			time.Sleep(time.Duration(nRandom) * time.Millisecond)
 			orderChannel <- meal
+			wg.Done()
 		}(meal)
 	}
+
+	wg.Wait()
+	close(orderChannel)
 
 	// go func(){
 	for meal := range orderChannel {
