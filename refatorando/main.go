@@ -4,48 +4,53 @@ import "fmt"
 
 func main() {
 	//Refeições
-	meal1 := Meal{
-		Drink: []string{"Cerveja", "Refrigerante"},
-		Food: []string{"Arroz amanteigado", "Macarrão com queijo, presunto e brócolis"},
+	orders := []Meal{
+		{
+			Drink: []string{"Cerveja", "Refrigerante"},
+			Food:  []string{"Arroz amanteigado", "Macarrão com queijo, presunto e brócolis"},
+		},
+
+		{
+			Drink: []string{"Suco", "Água"},
+			Food:  []string{"Bife acebolado"},
+		},
+
+		{
+			Drink: []string{"Suco"},
+			Food:  []string{"Feijão preto com bacon e salada de batata", "Arroz amanteigado"},
+		},
+
+		{
+			Drink: []string{"Água", "Refrigerante"},
+			Food:  []string{"Arroz amanteigado", "Bife acebolado"},
+		},
+
+		{
+			Drink: []string{"Cerveja", "Suco"},
+			Food:  []string{"Macarrão com queijo, presunto e brócolis", "Feijão preto com bacon e salada de batata"},
+		},
+	}
+	// Adicionando as refeições
+
+	orderChannel := make(chan Meal, len(orders))
+	defer close(orderChannel)
+
+	// for _, meal := range orders {
+	// 	go func(m Meal) {
+	// 		AddChannel(m, orderChannel)
+	// 		time.Sleep(1 * time.Second)
+	// 	}(meal)
+	// }
+
+	for _, meal := range orders {
+		go func(Meal) {
+			orderChannel <- meal
+		}(meal)
 	}
 
-	meal2 := Meal{
-		Drink: []string{"Suco", "Água"},
-		Food: []string{"Bife acebolado"},
-	}
-
-	meal3 := Meal{
-		Drink: []string{"Suco"},
-		Food:  []string{"Feijão preto com bacon e salada de batata", "Arroz amanteigado"},
-	}
-
-	meal4 := Meal{
-		Drink: []string{"Água", "Refrigerante"},
-		Food:  []string{"Arroz amanteigado", "Bife acebolado"},
-	}
-
-	meal5 := Meal{
-		Drink: []string{"Cerveja", "Suco"},
-		Food:  []string{"Macarrão com queijo, presunto e brócolis", "Feijão preto com bacon e salada de batata"},
-	}
-
-	// Adicionando as refeições 
-
-	orders := []Meal{meal1, meal2, meal3, meal4, meal5}
-
-	orderChannel := make(chan Meal)
-
-	go func() {
-		for _, order := range orders {
-			orderChannel <- order
-		}
-		close(orderChannel)
-	}()
-
-
+	// go func(){
 	for meal := range orderChannel {
 		receipt := &Receipt{}
-
 		receipt.AddOrder(meal)
 		receipt.CalculateTotal()
 		receipt.CalculateFeeAndFinal()
@@ -57,6 +62,6 @@ func main() {
 		}
 		fmt.Println(string(jsonData))
 	}
-
+	// }()
 
 }
