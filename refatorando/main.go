@@ -35,16 +35,9 @@ func main() {
 			Food:  []string{"Macarrão com queijo, presunto e brócolis", "Feijão preto com bacon e salada de batata"},
 		},
 	}
+
 	// Adicionando as refeições
-
 	orderChannel := make(chan Meal, len(orders))
-
-	// for _, meal := range orders {
-	// 	go func(m Meal) {
-	// 		AddChannel(m, orderChannel)
-	// 		time.Sleep(1 * time.Second)
-	// 	}(meal)
-	// }
 
 	wg := &sync.WaitGroup{}
 	wg.Add(len(orders))
@@ -62,7 +55,6 @@ func main() {
 	wg.Wait()
 	close(orderChannel)
 
-	// go func(){
 	for meal := range orderChannel {
 		receipt := &Receipt{}
 		receipt.AddOrder(meal)
@@ -76,6 +68,5 @@ func main() {
 		}
 		fmt.Println(string(jsonData))
 	}
-	// }()
 
 }
