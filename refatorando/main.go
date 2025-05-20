@@ -38,6 +38,7 @@ func main() {
 	}
 
 	// Adicionando os pedidos na channel
+
 	orderChannel := make(chan Meal, len(orders))
 
 	wg := &sync.WaitGroup{}
