@@ -1,5 +1,6 @@
 package main
 
+// Importações
 import (
 	"fmt"
 	"math/rand"
@@ -8,7 +9,7 @@ import (
 )
 
 func main() {
-	//Refeições
+	// Pedidos
 	orders := []Meal{
 		{
 			Drink: []string{"Cerveja", "Refrigerante"},
@@ -35,16 +36,9 @@ func main() {
 			Food:  []string{"Macarrão com queijo, presunto e brócolis", "Feijão preto com bacon e salada de batata"},
 		},
 	}
-	// Adicionando as refeições
 
+	// Adicionando os pedidos na channel
 	orderChannel := make(chan Meal, len(orders))
-
-	// for _, meal := range orders {
-	// 	go func(m Meal) {
-	// 		AddChannel(m, orderChannel)
-	// 		time.Sleep(1 * time.Second)
-	// 	}(meal)
-	// }
 
 	wg := &sync.WaitGroup{}
 	wg.Add(len(orders))
@@ -62,7 +56,7 @@ func main() {
 	wg.Wait()
 	close(orderChannel)
 
-	// go func(){
+	// Criando a nota fiscal
 	for meal := range orderChannel {
 		receipt := &Receipt{}
 		receipt.AddOrder(meal)
@@ -75,7 +69,6 @@ func main() {
 			return
 		}
 		fmt.Println(string(jsonData))
+		fmt.Print("----------------------------------------\n")
 	}
-	// }()
-
 }

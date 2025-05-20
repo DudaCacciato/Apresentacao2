@@ -1,11 +1,14 @@
 package main
 
+// Importações
 import (
 	"testing"
 )
 
+// Variável padrão para o retorno do teste 
 const erro = "Valor esperado: %v, Valor recebido: %v"
 
+// Teste da função AddOrder
 func TestAddOrder(t *testing.T) {
 	t.Parallel()
 
@@ -38,6 +41,7 @@ func TestAddOrder(t *testing.T) {
 	}
 }
 
+// Teste da função CalculateTotal
 func TestCalculateTotal(t *testing.T) {
 	t.Parallel()
 
@@ -75,6 +79,7 @@ func TestCalculateTotal(t *testing.T) {
 	}
 }
 
+//Teste da função CalculateFeeAndFinal
 func TestCalculateFeeAndFinal(t *testing.T) {
 	t.Parallel()
 

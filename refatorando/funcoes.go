@@ -7,11 +7,6 @@ import (
 	"math/rand"
 )
 
-// Interface para funções de pedido
-type OrderInterface interface {
-	Order(chan Meal)
-}
-
 // Interface para funções de nota fiscal
 type ReceiptInterface interface {
 	AddOrder(chan Meal)
@@ -47,12 +42,6 @@ func (r *Receipt) AddOrder(meal Meal) {
 	r.Order = append(r.Order, meal)
 }
 
-// Função que calcula a taxa de serviço e o valor final com taxa e adiciona na struct
-func (r *Receipt) CalculateFeeAndFinal() {
-	r.FeeAmount = math.Round(0.10 * r.TotalAmount)
-	r.FinalAmount = math.Round(r.TotalAmount + r.FeeAmount)
-}
-
 // Função que calcula o total sem taxa e adiciona na struct
 func (r *Receipt) CalculateTotal() {
 	total := 0.0
@@ -79,9 +68,15 @@ func (r *Receipt) CalculateTotal() {
 	r.TotalAmount = math.Round(total)
 }
 
+// Função que calcula a taxa de serviço e o valor final com taxa e adiciona na struct
+func (r *Receipt) CalculateFeeAndFinal() {
+	r.FeeAmount = math.Round(0.10 * r.TotalAmount)
+	r.FinalAmount = math.Round(r.TotalAmount + r.FeeAmount)
+}
+
 // Função que converte a nota fiscal para json
 func (r *Receipt) ToJSON() ([]byte, error) {
-	jsonData, err := json.Marshal(r)
+	jsonData, err := json.MarshalIndent(r, "", "  ")
 	if err != nil {
 		return nil, err
 	}
